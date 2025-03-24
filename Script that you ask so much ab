@@ -1,0 +1,68 @@
+--Made by Max10Zeon in 1 hour chalange code made in 5 minutes i know it isn't perfect but it was chalange I was in rush
+game.Players.PlayerAdded:Connect(function(player)
+	local leaderstats = Instance.new("Folder")
+	leaderstats.Name = "leaderstats"
+	leaderstats.Parent = player
+
+	local speed = Instance.new("IntValue")
+	speed.Name = "Speed"
+	speed.Value = 30
+	speed.Parent = leaderstats
+
+	local wins = Instance.new("IntValue")
+	wins.Name = "Wins"
+	wins.Value = 0
+	wins.Parent = leaderstats
+
+	local characterAdded
+	characterAdded = player.CharacterAdded:Connect(function(character)
+		local humanoid = character:FindFirstChildOfClass("Humanoid")
+		if humanoid then
+			humanoid.WalkSpeed = speed.Value
+		end
+	end)
+
+	while player.Parent do
+		task.wait(1)
+		speed.Value = speed.Value + 1 + wins.Value
+		if player.Character then
+			local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+			if humanoid then
+				humanoid.WalkSpeed = speed.Value * 0.1
+			end
+		end
+	end
+end)
+
+local debounceList = {}
+
+local function onTouched(part)
+	local player = game.Players:GetPlayerFromCharacter(part.Parent)
+	if player and not debounceList[player] then
+		debounceList[player] = true
+		local leaderstats = player:FindFirstChild("leaderstats")
+		if leaderstats then
+			local speed = leaderstats:FindFirstChild("Speed")
+			local wins = leaderstats:FindFirstChild("Wins")
+			if speed and wins then
+				wins.Value = wins.Value + 1
+				speed.Value = 0
+				local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+				if humanoid then
+					humanoid.Health = 0
+				end
+				task.wait(5)
+			end
+		end
+		debounceList[player] = nil
+	end
+end
+
+local namesToFind = {"win", "win2", "win3"}
+
+for _, name in pairs(namesToFind) do
+	local resetPart = game.Workspace:FindFirstChild(name)
+	if resetPart and resetPart:IsA("BasePart") then
+		resetPart.Touched:Connect(onTouched)
+	end
+end
